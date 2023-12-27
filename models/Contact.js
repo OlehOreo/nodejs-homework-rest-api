@@ -39,7 +39,7 @@ export const contactAddSchema = Joi.object({
 		.regex(/^\(\d{3}\) \d{3}-\d{4}$/)
 		.required()
 		.messages({ "any.required": "missing required phone field" }),
-	favorite: Joi.boolean(),
+	
 });
 export const contactUpdateSchema = Joi.object({
 	name: Joi.string(),
@@ -47,7 +47,7 @@ export const contactUpdateSchema = Joi.object({
 	phone: Joi.string()
 		.trim()
 		.regex(/^\(\d{3}\) \d{3}-\d{4}$/),
-	favorite: Joi.boolean(),
+	
 });
 
 export const contactUpdateFavoriteSchema = Joi.object({ favorite: Joi.boolean().required() });
