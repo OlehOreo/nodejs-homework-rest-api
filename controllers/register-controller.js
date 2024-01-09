@@ -40,7 +40,7 @@ const signIn = async (req, res) => {
 	};
 
 	const token = jwt.sign(payload, JWT_SECRET, { expiresIn: "23h" });
-	
+
 	await User.findByIdAndUpdate(id, { token });
 
 	res.json({
@@ -68,15 +68,17 @@ const logOut = async (req, res) => {
 
 const updateSubscription = async (req, res) => {
 	const { _id: owner, subscription: old } = req.user;
-	console.log(old);
-	const result = await User.findOneAndUpdate(owner, req.body);
 	const { subscription: newSubscription } = req.body;
-	if (!result) {
-		throw HttpError(404);
-	}
+
 	if (old === newSubscription) {
 		throw HttpError(409, `your subscription now ${newSubscription} choose another`);
 	}
+	const result = await User.findOneAndUpdate(owner, req.body);
+
+	if (!result) {
+		throw HttpError(404);
+	}
+
 	res.json({
 		message: `subscription changed from ${old} to ${newSubscription}`,
 		email: result.email,
