@@ -1,5 +1,7 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import path from "path";
+import gravatar from "gravatar";
 
 import User from "../models/User.js";
 import { HttpError } from "../helpers/index.js";
@@ -9,6 +11,15 @@ const { JWT_SECRET } = process.env;
 
 const signUp = async (req, res) => {
 	const { email, password } = req.body;
+
+	const defaultAvatar =
+		"https://upload.wikimedia.org/wikipedia/commons/thumb/a/a8/Google_Contacts_icon_%282022%29.svg/250px-Google_Contacts_icon_%282022%29.svg.png";
+
+	const avatarURL = gravatar.url(email, {
+		s: "250",
+		d: defaultAvatar,
+	});
+
 	const user = await User.findOne({ email });
 
 	if (user) {
@@ -16,7 +27,7 @@ const signUp = async (req, res) => {
 	}
 	const hashPassword = await bcrypt.hash(password, 10);
 
-	const newUser = await User.create({ ...req.body, password: hashPassword });
+	const newUser = await User.create({ ...req.body, password: hashPassword, avatarURL });
 
 	res.status(201).json({ user: { email: newUser.email, subscription: newUser.subscription } });
 };
@@ -85,10 +96,21 @@ const updateSubscription = async (req, res) => {
 	});
 };
 
+const addAvatar = async (req, res) => {
+	const { _id: owner } = req.user;
+	const { filename } = req.file;
+	const avatar = path.join("avatars", filename).replace(/\\/g, "/");
+
+	const saveAvatar = await User.findOneAndUpdate(owner, { avatarURL: avatar });
+
+	res.json({ avatarURL: saveAvatar.avatarURL });
+};
+
 export default {
 	signUp: ctrlWrapper(signUp),
 	signIn: ctrlWrapper(signIn),
 	getCurrent: ctrlWrapper(getCurrent),
 	logOut: ctrlWrapper(logOut),
 	updateSubscription: ctrlWrapper(updateSubscription),
+	addAvatar: ctrlWrapper(addAvatar),
 };

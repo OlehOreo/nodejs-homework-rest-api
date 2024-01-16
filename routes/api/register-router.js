@@ -1,7 +1,7 @@
 import express from "express";
 
 import registerController from "../../controllers/register-controller.js";
-import { isEmptyBody, authenticate } from "../../middlewares/index.js";
+import { isEmptyBody, authenticate, upload, processUserAvatar } from "../../middlewares/index.js";
 import { validateBody } from "../../decorators/index.js";
 
 import { userSignUpSchema, userSignInSchema, userUpdateSubscriptionSchema } from "../../models/User.js";
@@ -14,6 +14,14 @@ registerRouter.patch(
 	isEmptyBody,
 	validateBody(userUpdateSubscriptionSchema),
 	registerController.updateSubscription
+);
+
+registerRouter.patch(
+	"/avatars",
+	authenticate,
+	upload.single("avatar"),
+	processUserAvatar,
+	registerController.addAvatar
 );
 
 registerRouter.post("/register", isEmptyBody, validateBody(userSignUpSchema), registerController.signUp);
