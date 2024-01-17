@@ -1,7 +1,7 @@
 import express from "express";
 
 import registerController from "../../controllers/register-controller.js";
-import { isEmptyBody, authenticate, upload, processUserAvatar } from "../../middlewares/index.js";
+import { isEmptyBody, authenticate, upload } from "../../middlewares/index.js";
 import { validateBody } from "../../decorators/index.js";
 
 import { userSignUpSchema, userSignInSchema, userUpdateSubscriptionSchema } from "../../models/User.js";
@@ -9,20 +9,14 @@ import { userSignUpSchema, userSignInSchema, userUpdateSubscriptionSchema } from
 const registerRouter = express.Router();
 
 registerRouter.patch(
-	"/",
+	"/subscription",
 	authenticate,
 	isEmptyBody,
 	validateBody(userUpdateSubscriptionSchema),
 	registerController.updateSubscription
 );
 
-registerRouter.patch(
-	"/avatars",
-	authenticate,
-	upload.single("avatar"),
-	processUserAvatar,
-	registerController.addAvatar
-);
+registerRouter.patch("/avatars", authenticate, upload.single("avatar"), registerController.addAvatar);
 
 registerRouter.post("/register", isEmptyBody, validateBody(userSignUpSchema), registerController.signUp);
 

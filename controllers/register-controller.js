@@ -2,10 +2,12 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import path from "path";
 import gravatar from "gravatar";
+import fs from "fs/promises";
 
 import User from "../models/User.js";
 import { HttpError } from "../helpers/index.js";
 import { ctrlWrapper } from "../decorators/index.js";
+import Jimp from "jimp";
 
 const { JWT_SECRET } = process.env;
 
@@ -98,7 +100,19 @@ const updateSubscription = async (req, res) => {
 
 const addAvatar = async (req, res) => {
 	const { _id: owner } = req.user;
-	const { filename } = req.file;
+	const { filename, path: tmpDir } = req.file;
+
+	const avatarPath = path.resolve("public", "avatars", filename);
+
+	Jimp.read(tmpDir)
+		.then(image => image.resize(250, 250).writeAsync(avatarPath))
+		.catch(error => {
+			next(error);
+		})
+		.finally(() => {
+			fs.unlink(tmpDir);
+		});
+
 	const avatar = path.join("avatars", filename).replace(/\\/g, "/");
 
 	const saveAvatar = await User.findOneAndUpdate(owner, { avatarURL: avatar });
