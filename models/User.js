@@ -23,6 +23,13 @@ const userSchema = new Schema(
 			enum: ["starter", "pro", "business"],
 			default: "starter",
 		},
+		verify: {
+			type: Boolean,
+			default: false,
+		},
+		verificationToken: {
+			type: String,
+		},
 		avatarURL: String,
 		token: String,
 		owner: {
@@ -49,6 +56,10 @@ export const userSignInSchema = Joi.object({
 });
 export const userUpdateSubscriptionSchema = Joi.object({
 	subscription: Joi.string().valid("starter", "pro", "business").required(),
+});
+
+export const userEmailSchema = Joi.object({
+	email: Joi.string().pattern(emailRegexp).required(),
 });
 
 const User = model("user", userSchema);

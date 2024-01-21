@@ -4,7 +4,12 @@ import registerController from "../../controllers/register-controller.js";
 import { isEmptyBody, authenticate, upload } from "../../middlewares/index.js";
 import { validateBody } from "../../decorators/index.js";
 
-import { userSignUpSchema, userSignInSchema, userUpdateSubscriptionSchema } from "../../models/User.js";
+import {
+	userSignUpSchema,
+	userSignInSchema,
+	userUpdateSubscriptionSchema,
+	userEmailSchema,
+} from "../../models/User.js";
 
 const registerRouter = express.Router();
 
@@ -19,6 +24,10 @@ registerRouter.patch(
 registerRouter.patch("/avatars", authenticate, upload.single("avatar"), registerController.addAvatar);
 
 registerRouter.post("/register", isEmptyBody, validateBody(userSignUpSchema), registerController.signUp);
+
+registerRouter.get("/register/verify/:verificationToken", registerController.verify);
+
+registerRouter.post("/verify", isEmptyBody, validateBody(userEmailSchema), registerController.resendVerifyEmail);
 
 registerRouter.post("/login", isEmptyBody, validateBody(userSignInSchema), registerController.signIn);
 
