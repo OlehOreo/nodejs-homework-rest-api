@@ -25,7 +25,7 @@ registerRouter.patch("/avatars", authenticate, upload.single("avatar"), register
 
 registerRouter.post("/register", isEmptyBody, validateBody(userSignUpSchema), registerController.signUp);
 
-registerRouter.get("/register/verify/:verificationToken", registerController.verify);
+registerRouter.get("/verify/:verificationToken", registerController.verify);
 
 registerRouter.post("/verify", isEmptyBody, validateBody(userEmailSchema), registerController.resendVerifyEmail);
 
